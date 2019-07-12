@@ -41,7 +41,7 @@ type ClubHouseCreateStory struct {
 	RequestedBy		string					 `json:"requested_by_id"`
 }
 
-// ClubHouseCreateLabel is used to submit labels with stories, it looks like from the API that duplicates will not be created.
+// ClubHouseCreateLabel is used togo run *.go import --in SearchRequest.xml --map userMap.json --token $CLUBHOUSE_API_TOKEN submit labels with stories, it looks like from the API that duplicates will not be created.
 type ClubHouseCreateLabel struct {
 	Name string `json:"name"`
 }

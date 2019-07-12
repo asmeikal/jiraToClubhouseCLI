@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/xml"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -161,33 +162,41 @@ func (item *JiraItem) CreateStory(userMaps []userMap) ClubHouseCreateStory {
 		owners = make([]string, 0)
 	}
 
+	estimate := int64(0)
+	for _, cf := range item.CustomFields {
+		if cf.FieldName == "Story Points" {
+			estimateFloat := 0.0
+			estimateFloat, _ = strconv.ParseFloat(cf.FieldVales[0], 64)
+			estimate = int64(estimateFloat)
+		}
+	}
+
 	// Map JIRA status to Clubhouse Workflow state
 	// cases break automatically, no fallthrough by default
-	var state int64 = 500000014
+	var state int64 = 500000007
 	switch item.Status {
-	    case "Ready for Test":
-	        // ready for test
+	    case "In Review":
+	        // In Review
 	        state = 500000010
-	    case "Task In Progress":
-	        // in progress
-	        state = 500000015
-	    case "Selected for Review/Development":
-	    	// selected
-	    	state = 500000011
-	    case "Task backlog":
-	    	// backlog
-	        state = 500000014
+	    case "To Do":
+	        // To Do
+	        state = 500000007
+	    case "In Progress":
+	    	// In Progress
+	    	state = 500000006
 	    case "Done":
-	    	// Completed
-	    	state = 500000012
-	    case "Verified":
-	    	// Completed
-	    	state = 500000012
+	    	// Done
+	        state = 500000011
+	    case "To Fix After Review":
+	    	// To Fix After Review
+	    	state = 500000025
 	    case "Closed":
-	    	state = 500000021
+	    	// To Do
+	    	// TODO: update story to set as archived
+	    	state = 500000007
 	    default:
-	    	// backlog
-	        state = 500000014
+	    	// To Do
+	        state = 500000007
     }
 
     requestor := MapUser(userMaps, item.Reporter.Username)
@@ -213,6 +222,7 @@ func (item *JiraItem) CreateStory(userMaps []userMap) ClubHouseCreateStory {
 		WorkflowState:	state,
 		OwnerIDs:		owners,
 		RequestedBy:	requestor,
+		Estimate:       estimate,
 	}
 }
 
